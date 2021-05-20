@@ -3,6 +3,9 @@ uuid = "0a04ae36-224e-4f30-97ab-47197715d6e3"
 authors = ["Felipe S. S. Schneider <schneider.felipe@posgrad.ufsc.br> and contributors"]
 version = "0.1.0"
 
+[deps]
+Markdown = "d6f4376e-aef5-505a-96c1-9c027394607a"
+
 [compat]
 julia = "1"
 
