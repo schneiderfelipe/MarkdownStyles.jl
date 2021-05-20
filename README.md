@@ -1,2 +1,3 @@
 # MarkdownStyles.jl
-[WIP] ☭ Class struggle meets Markdown.jl
+
+Add classes to Markdown.jl elements for maximum customization.
