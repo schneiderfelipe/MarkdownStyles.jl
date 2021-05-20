@@ -1,10 +1,20 @@
+const NoStyle = Style{:nostyle}
+class(::Style) = "markdown"
+
 # Block elements
 
-Markdown.html(io::IO, md::Styled{Markdown.MD}) = html(io, md.content)
+function Markdown.html(io::IO, c::Styled{<:AbstractVector})
+    for md ∈ content(c)
+        html(io, style(c)(md))
+        println(io)
+    end
+end
+
+Markdown.html(io::IO, md::Styled{Markdown.MD}) = html(io, style(md)(md.content))
 
 function Markdown.html(io::IO, header::Styled{Markdown.Header{l}}) where l
     Markdown.withtag(io, "h$l") do
-        htmlinline(io, header.text)
+        Markdown.htmlinline(io, style(header)(header.text))
     end
 end
 
@@ -20,14 +30,14 @@ end
 
 function Markdown.html(io::IO, md::Styled{Markdown.Paragraph})
     Markdown.withtag(io, :p) do
-        htmlinline(io, md.content)
+        Markdown.htmlinline(io, style(md)(md.content))
     end
 end
 
 function Markdown.html(io::IO, md::Styled{Markdown.BlockQuote})
     Markdown.withtag(io, :blockquote) do
         println(io)
-        html(io, md.content)
+        html(io, style(md)(md.content))
     end
 end
 
@@ -36,7 +46,7 @@ function Markdown.html(io::IO, f::Styled{Markdown.Footnote})
         Markdown.withtag(io, :p, :class => "footnote-title") do
             print(io, f.id)
         end
-        html(io, f.text)
+        html(io, style(f)(f.text))
     end
 end
 
@@ -45,17 +55,17 @@ function Markdown.html(io::IO, md::Styled{Markdown.Admonition})
         Markdown.withtag(io, :p, :class => "admonition-title") do
             print(io, md.title)
         end
-        html(io, md.content)
+        html(io, style(md)(md.content))
     end
 end
 
 function Markdown.html(io::IO, md::Styled{Markdown.List})
     maybe_attr = md.ordered > 1 ? Any[:start => string(md.ordered)] : []
-    Markdown.withtag(io, isordered(md) ? :ol : :ul, maybe_attr...) do
-        for item in md.items
+    Markdown.withtag(io, Markdown.isordered(content(md)) ? :ol : :ul, maybe_attr...) do
+        for item ∈ md.items
             println(io)
             Markdown.withtag(io, :li) do
-                html(io, item)
+                html(io, style(md)(item))
             end
         end
         println(io)
@@ -68,21 +78,31 @@ end
 
 # Inline elements
 
+function Markdown.htmlinline(io::IO, c::Styled{<:AbstractVector})
+    for x ∈ content(c)
+        Markdown.htmlinline(io, style(c)(x))
+    end
+end
+
 function Markdown.htmlinline(io::IO, code::Styled{Markdown.Code})
     Markdown.withtag(io, :code) do
         Markdown.htmlesc(io, code.code)
     end
 end
 
+function Markdown.htmlinline(io::IO, md::Styled{<:Union{Symbol,AbstractString}})
+    Markdown.htmlesc(io, content(md))
+end
+
 function Markdown.htmlinline(io::IO, md::Styled{Markdown.Bold})
     Markdown.withtag(io, :strong) do
-        htmlinline(io, md.text)
+        Markdown.htmlinline(io, style(md)(md.text))
     end
 end
 
 function Markdown.htmlinline(io::IO, md::Styled{Markdown.Italic})
     Markdown.withtag(io, :em) do
-        htmlinline(io, md.text)
+        Markdown.htmlinline(io, style(md)(md.text))
     end
 end
 
@@ -98,7 +118,7 @@ end
 
 function Markdown.htmlinline(io::IO, link::Styled{Markdown.Link})
     Markdown.withtag(io, :a, :href => link.url) do
-        htmlinline(io, link.text)
+        Markdown.htmlinline(io, style(link)(link.text))
     end
 end
 
