@@ -44,3 +44,5 @@ julia> sprint(show, "text/html", Bulma(m))  # Uses Bulma message component 🎉
 </div>
 """
 ```
+
+Read the code in [src/styles/bulma.jl](https://github.com/schneiderfelipe/MarkdownStyles.jl/blob/master/src/styles/bulma.jl) to learn how to implement a style.
