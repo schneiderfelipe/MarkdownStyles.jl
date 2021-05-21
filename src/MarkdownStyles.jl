@@ -31,7 +31,7 @@ function Base.show(io::IO, ::MIME"text/html", md::Styled{Markdown.MD})
     end
 end
 
-include("html.jl")
+include("styles/nostyle.jl")
 include("styles/bulma.jl")
 
 end

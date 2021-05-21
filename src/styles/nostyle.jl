@@ -3,6 +3,8 @@ class(::Style) = "markdown"
 
 # Block elements
 
+Markdown.html(io::IO, md::Styled) = html(io, content(md))
+
 function Markdown.html(io::IO, c::Styled{<:AbstractVector})
     for md ∈ content(c)
         html(io, style(c)(md))
@@ -18,15 +20,15 @@ function Markdown.html(io::IO, header::Styled{Markdown.Header{l}}) where l
     end
 end
 
-function Markdown.html(io::IO, code::Styled{Markdown.Code})
-    Markdown.withtag(io, :pre) do
-        maybe_lang = !isempty(code.language) ? Any[:class => "language-$(code.language)"] : []
-        Markdown.withtag(io, :code, maybe_lang...) do
-            Markdown.htmlesc(io, code.code)
-            # TODO should print newline if this is longer than one line ?
-        end
-    end
-end
+# function Markdown.html(io::IO, code::Styled{Markdown.Code})
+#     Markdown.withtag(io, :pre) do
+#         maybe_lang = !isempty(code.language) ? Any[:class => "language-$(code.language)"] : []
+#         Markdown.withtag(io, :code, maybe_lang...) do
+#             Markdown.htmlesc(io, code.code)
+#             # TODO should print newline if this is longer than one line ?
+#         end
+#     end
+# end
 
 function Markdown.html(io::IO, md::Styled{Markdown.Paragraph})
     Markdown.withtag(io, :p) do
@@ -72,11 +74,13 @@ function Markdown.html(io::IO, md::Styled{Markdown.List})
     end
 end
 
-function Markdown.html(io::IO, md::Styled{Markdown.HorizontalRule})
-    Markdown.tag(io, :hr)
-end
+# function Markdown.html(io::IO, md::Styled{Markdown.HorizontalRule})
+#     Markdown.tag(io, :hr)
+# end
 
 # Inline elements
+
+Markdown.htmlinline(io::IO, md::Styled) = Markdown.htmlinline(io, content(md))
 
 function Markdown.htmlinline(io::IO, c::Styled{<:AbstractVector})
     for x ∈ content(c)
@@ -84,15 +88,15 @@ function Markdown.htmlinline(io::IO, c::Styled{<:AbstractVector})
     end
 end
 
-function Markdown.htmlinline(io::IO, code::Styled{Markdown.Code})
-    Markdown.withtag(io, :code) do
-        Markdown.htmlesc(io, code.code)
-    end
-end
+# function Markdown.htmlinline(io::IO, code::Styled{Markdown.Code})
+#     Markdown.withtag(io, :code) do
+#         Markdown.htmlesc(io, code.code)
+#     end
+# end
 
-function Markdown.htmlinline(io::IO, md::Styled{<:Union{Symbol,AbstractString}})
-    Markdown.htmlesc(io, content(md))
-end
+# function Markdown.htmlinline(io::IO, md::Styled{<:Union{Symbol,AbstractString}})
+#     Markdown.htmlesc(io, content(md))
+# end
 
 function Markdown.htmlinline(io::IO, md::Styled{Markdown.Bold})
     Markdown.withtag(io, :strong) do
@@ -106,15 +110,15 @@ function Markdown.htmlinline(io::IO, md::Styled{Markdown.Italic})
     end
 end
 
-function Markdown.htmlinline(io::IO, md::Styled{Markdown.Image})
-    Markdown.tag(io, :img, :src => md.url, :alt => md.alt)
-end
+# function Markdown.htmlinline(io::IO, md::Styled{Markdown.Image})
+#     Markdown.tag(io, :img, :src => md.url, :alt => md.alt)
+# end
 
-function Markdown.htmlinline(io::IO, f::Styled{Markdown.Footnote})
-    Markdown.withtag(io, :a, :href => "#footnote-$(f.id)", :class => "footnote") do
-        print(io, "[", f.id, "]")
-    end
-end
+# function Markdown.htmlinline(io::IO, f::Styled{Markdown.Footnote})
+#     Markdown.withtag(io, :a, :href => "#footnote-$(f.id)", :class => "footnote") do
+#         print(io, "[", f.id, "]")
+#     end
+# end
 
 function Markdown.htmlinline(io::IO, link::Styled{Markdown.Link})
     Markdown.withtag(io, :a, :href => link.url) do
@@ -122,6 +126,6 @@ function Markdown.htmlinline(io::IO, link::Styled{Markdown.Link})
     end
 end
 
-function Markdown.htmlinline(io::IO, br::Styled{Markdown.LineBreak})
-    Markdown.tag(io, :br)
-end
+# function Markdown.htmlinline(io::IO, br::Styled{Markdown.LineBreak})
+#     Markdown.tag(io, :br)
+# end
