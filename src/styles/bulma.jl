@@ -23,3 +23,18 @@ function Markdown.htmlinline(io::IO, md::Styled{Markdown.Image,Bulma})
         Markdown.tag(io, :img, :src => md.url, :alt => md.alt)
     end
 end
+
+# Extra elements
+
+function Markdown.html(io::IO, md::Styled{Markdown.Table,Bulma})
+    Markdown.withtag(io, :table, :class => "table") do
+        Markdown.withtag(io, :thead) do
+            htmltablerow(io, md, 1)
+        end
+        Markdown.withtag(io, :tbody) do
+            for i ∈ 2:length(md.rows)
+                htmltablerow(io, md, i)
+            end
+        end
+    end
+end

@@ -129,3 +129,24 @@ end
 # function Markdown.htmlinline(io::IO, br::Styled{Markdown.LineBreak})
 #     Markdown.tag(io, :br)
 # end
+
+# Extra elements
+
+function Markdown.html(io::IO, md::Styled{Markdown.Table})
+    Markdown.withtag(io, :table) do
+        for (i, _) ∈ enumerate(md.rows)
+            htmltablerow(io, md, i)
+        end
+    end
+end
+function htmltablerow(io::IO, md::Styled{Markdown.Table}, i::Integer)
+    Markdown.withtag(io, :tr) do
+        for (j, c) ∈ enumerate(md.rows[i])
+            alignment = md.align[j]
+            alignment = alignment === :l ? "left" : alignment === :r ? "right" : "center"
+            Markdown.withtag(io, i == 1 ? :th : :td, ("align", alignment)) do
+                Markdown.htmlinline(io, style(md)(c))
+            end
+        end
+    end
+end

@@ -55,12 +55,23 @@ end
         link=md"[link](https://julialang.com)",
     )
 
+    extras = (
+        table=md"""
+        | a | b | c | d |
+        |--:|:--|:-:|---|
+        | 0 | 1 | 2 | 3 |
+        """,
+    )
+
     # New styles behave the same as Markdown.jl by default
     @testset "NoStyle" begin
         @testset "Block elements" for x ∈ blocks
             @rendersas NoStyle(x) x
         end
         @testset "Inline elements" for x ∈ inlines
+            @rendersas NoStyle(x) x
+        end
+        @testset "Extra elements" for x ∈ extras
             @rendersas NoStyle(x) x
         end
     end
@@ -76,8 +87,14 @@ end
                 @rendersas Bulma(x) x "content"
             end
         end
+        @testset "Extra elements" for (k, x) ∈ pairs(extras)
+            if k ∉ (:table,)
+                @rendersas Bulma(x) x "content"
+            end
+        end
 
         @renders Bulma(blocks.admonition) """<div class="content"><article class="message is-info"><div class="message-header"><p>Info</p></div><div class="message-body"><p>admonition</p>\n</div></article>\n</div>"""
         @renders Bulma(inlines.image) """<div class="content"><p><figure class="image"><img src="https://picsum.photos/200/200" alt="image" /></figure></p>\n</div>"""
+        @renders Bulma(extras.table) """<div class="content"><table class="table"><thead><tr><th align="right">a</th><th align="left">b</th><th align="center">c</th><th align="right">d</th></tr></thead><tbody><tr><td align="right">0</td><td align="left">1</td><td align="center">2</td><td align="right">3</td></tr></tbody></table>\n</div>"""
     end
 end
